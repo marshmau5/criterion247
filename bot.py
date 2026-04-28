@@ -17,11 +17,20 @@ def get_current_title():
     text = soup.get_text("\n", strip=True)
     lines = [line.strip() for line in text.split("\n") if line.strip()]
 
-    for i, line in enumerate(lines):
-        if "what's on now" in line.lower():
-            # Return the next line after "What's on now"
-            if i + 1 < len(lines):
-                return lines[i + 1]
+    for line in lines:
+        lower = line.lower()
+
+        # Look for any variation of "what's on now"
+        if "what" in lower and "on now" in lower:
+            if ":" in line:
+                title = line.split(":", 1)[1].strip()
+                if title:
+                    return title
+
+    # Debug fallback (helps if it breaks again)
+    print("Could not find title. Page lines were:")
+    for line in lines:
+        print(line)
 
     raise ValueError("Could not find current title")
 
