@@ -15,13 +15,13 @@ def get_current_title():
     soup = BeautifulSoup(html, "html.parser")
 
     text = soup.get_text("\n", strip=True)
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
 
-    # Look for the exact line containing the current film
-    for line in text.split("\n"):
-        line = line.strip()
-
-        if line.lower().startswith("what's on now:"):
-            return line.replace("What's on now:", "").strip()
+    for i, line in enumerate(lines):
+        if "what's on now" in line.lower():
+            # Return the next line after "What's on now"
+            if i + 1 < len(lines):
+                return lines[i + 1]
 
     raise ValueError("Could not find current title")
 
@@ -43,7 +43,7 @@ def post_to_bluesky(title):
     client = Client()
     client.login(BSKY_HANDLE, BSKY_APP_PASSWORD)
 
-    post = f"""Now playing on Criterion 24/7:
+    post = f"""🎬 Now playing on Criterion 24/7:
 
 {title}
 
