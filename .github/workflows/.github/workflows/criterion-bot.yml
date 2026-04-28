@@ -1,0 +1,39 @@
+name: Criterion Bluesky Bot
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run bot
+        run: python bot.py
+        env:
+          BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+
+      - name: Save last seen movie
+        run: |
+          git config user.name "criterion-bot"
+          git config user.email "criterion-bot@users.noreply.github.com"
+          git add last_seen.txt
+          git commit -m "Update last seen movie" || echo "No changes to commit"
+          git push
