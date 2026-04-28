@@ -15,16 +15,13 @@ def get_current_title():
     soup = BeautifulSoup(html, "html.parser")
 
     text = soup.get_text("\n", strip=True)
-    lines = [line.strip() for line in text.split("\n") if line.strip()]
 
-    for line in lines:
-        lower = line.lower()
-        if (
-            "criterion" not in lower
-            and "what's on now" not in lower
-            and "watch now" not in lower
-        ):
-            return line
+    # Look for the exact line containing the current film
+    for line in text.split("\n"):
+        line = line.strip()
+
+        if line.lower().startswith("what's on now:"):
+            return line.replace("What's on now:", "").strip()
 
     raise ValueError("Could not find current title")
 
